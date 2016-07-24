@@ -150,9 +150,7 @@ MStatus ikSolver2::compute(const MPlug& plug, MDataBlock& dataBlock)
 		double joint1initLengthV = dataBlock.inputValue(joint1initLength).asDouble();
 		double joint2initLengthV = dataBlock.inputValue(joint2initLength).asDouble();
 
-
 		//compute total chain length
-		double chainLenght = upInitLengthV + downInitLengthV;
 
 		//MVector inputTranslateV = dataBlock.inputValue(inputTranslate).asVector();
 
@@ -168,14 +166,34 @@ MStatus ikSolver2::compute(const MPlug& plug, MDataBlock& dataBlock)
 			effectorMatrixV[3][1],
 			effectorMatrixV[3][2]);
 
+		double chainLenght = joint1initLengthV + joint2initLengthV;
+
+
 		//compute needed vectors
-		MVector upVec = upVectorMatrixPos - inputTranslateV;
-		MVector aimVec = driverMatrixPos - inputTranslateV;
-		upVec.normalize();
-		aimVec.normalize();
-		//compute perpendicular vectors
-		MVector cross = aimVec^upVec;
-		upVec = cross ^ aimVec;
+		MVector baseEff = effectorMatrixPos -baseMatrixPos ;
+		MVector basePoleVec = poleVectorMatrixPos - baseMatrixPos;
+		
+		//calculate rotation plane , rotapion plane vector x is baseEff
+		MVector rotPlaneY = baseEff ^ basePoleVec;
+		MVector rotPlaneZ = rotPlaneY ^ baseEff;
+
+		if (chainLenght > baseEff.length())
+		{
+			// calculate ik here
+			// b = joint1 lenght
+			// a = joint2 lenght
+			// c = distance from base to eff
+			// cos A = (-a^2 + b^2 +c^2)/(2bc)
+			// this will give me the angle to rotate the baseEff vector around previously 
+			// calculated y axis vector of the rotation plane
+
+			// joint 2 will only need to aim at the effector
+			// joint 3 doesnt need to do anything
+		}
+		
+
+		// this part is left overs from the aim node just so i remember how to 
+		// set rotations, and it can be ignored for now
 
 		// Build rotation matrix
 		double myMatrix[4][4] = { {aimVec.x, aimVec.y, aimVec.z, 0},
