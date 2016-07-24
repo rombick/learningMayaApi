@@ -61,6 +61,18 @@ MStatus ikSolver2::initialize()
 	effectorMatrix = matrixFn.create("effectorMatrix", "efm");
 	addAttribute(effectorMatrix);
 
+	joint1initLength = numFn.create("joint1initLength", "jnt1l", MFnNumericData::kDouble, 0);
+	numFn.setStorable(true);
+	numFn.setKeyable(true);
+	numFn.setMin(0.001);
+	addAttribute(joint1initLength);
+
+	joint2initLength = numFn.create("joint2initLength", "jnt2l", MFnNumericData::kDouble, 0);
+	numFn.setStorable(true);
+	numFn.setKeyable(true);
+	numFn.setMin(0.001);
+	addAttribute(joint2initLength);
+
 	jnt1OutputRotateX = uAttr.create("jnt1OutputRotateX", "jnt1rx", MFnUnitAttribute::kAngle, 0.0);
 	uAttr.setStorable(false);
 	uAttr.setKeyable(false);
@@ -128,20 +140,33 @@ MStatus ikSolver2::initialize()
 
 MStatus ikSolver2::compute(const MPlug& plug, MDataBlock& dataBlock)
 {
-	if ((plug == outputRotate) || (plug == outputRotateX)
-		|| (plug == outputRotateY) || (plug == outputRotateZ))
+	if ((plug == jnt2OutputRotate) || (plug == jnt1OutputRotate))
 	{
-		MMatrix driverMatrixV = dataBlock.inputValue(driverMatrix).asMatrix();
-		MMatrix upVectorMatrixV = dataBlock.inputValue(upVectorMatrix).asMatrix();
-		MVector inputTranslateV = dataBlock.inputValue(inputTranslate).asVector();
+		MMatrix baseMatrixV = dataBlock.inputValue(baseMatrix).asMatrix();
+		MMatrix poleVectorMatrixV = dataBlock.inputValue(poleVectorMatrix).asMatrix();
+		MMatrix effectorMatrixV = dataBlock.inputValue(effectorMatrix).asMatrix();
+
+		//get initial length input
+		double joint1initLengthV = dataBlock.inputValue(joint1initLength).asDouble();
+		double joint2initLengthV = dataBlock.inputValue(joint2initLength).asDouble();
+
+
+		//compute total chain length
+		double chainLenght = upInitLengthV + downInitLengthV;
+
+		//MVector inputTranslateV = dataBlock.inputValue(inputTranslate).asVector();
 
 		// get positions
-		MVector driverMatrixPos(driverMatrixV[3][0],
-			driverMatrixV[3][1],
-			driverMatrixV[3][2]);
-		MVector upVectorMatrixPos(upVectorMatrixV[3][0],
-			upVectorMatrixV[3][1],
-			upVectorMatrixV[3][2]);
+		MVector baseMatrixPos(baseMatrixV[3][0],
+			baseMatrixV[3][1],
+			baseMatrixV[3][2]);
+		MVector poleVectorMatrixPos(poleVectorMatrixV[3][0],
+			poleVectorMatrixV[3][1],
+			poleVectorMatrixV[3][2]);
+
+		MVector effectorMatrixPos(effectorMatrixV[3][0],
+			effectorMatrixV[3][1],
+			effectorMatrixV[3][2]);
 
 		//compute needed vectors
 		MVector upVec = upVectorMatrixPos - inputTranslateV;
