@@ -23,16 +23,20 @@
 
 MTypeId ikSolver2::typeId(0x80001);
 
-MObject ikSolver2::inputTranslateX;
-MObject ikSolver2::inputTranslateY;
-MObject ikSolver2::inputTranslateZ;
-MObject ikSolver2::inputTranslate;
-MObject ikSolver2::outputRotateX;
-MObject ikSolver2::outputRotateY;
-MObject ikSolver2::outputRotateZ;
-MObject ikSolver2::outputRotate;
-MObject ikSolver2::driverMatrix;
-MObject ikSolver2::upVectorMatrix;
+MObject ikSolver2::joint1initLength;
+MObject ikSolver2::joint2initLength;
+MObject ikSolver2::jnt1OutputRotateX;
+MObject ikSolver2::jnt1OutputRotateY;
+MObject ikSolver2::jnt1OutputRotateZ;
+MObject ikSolver2::jnt1OutputRotate;
+MObject ikSolver2::jnt2OutputRotateX;
+MObject ikSolver2::jnt2OutputRotateY;
+MObject ikSolver2::jnt2OutputRotateZ;
+MObject ikSolver2::jnt2OutputRotate;
+MObject ikSolver2::effectorMatrix;
+MObject ikSolver2::poleVectorMatrix;
+MObject ikSolver2::baseMatrix;
+
 
 void* ikSolver2::creator()
 {
@@ -48,69 +52,76 @@ MStatus ikSolver2::initialize()
 	MFnMatrixAttribute matrixFn;
 	MFnUnitAttribute uAttr;
 
-	driverMatrix = matrixFn.create("driverMatrix", "dvm");
-	addAttribute(driverMatrix);
+	baseMatrix = matrixFn.create("baseMatrix", "bsm");
+	addAttribute(baseMatrix);
 
-	upVectorMatrix = matrixFn.create("upVectorMatrix", "uvm");
-	addAttribute(upVectorMatrix);
+	poleVectorMatrix = matrixFn.create("poleVectorMatrix", "pvm");
+	addAttribute(poleVectorMatrix);
 
-	inputTranslateX = numFn.create("inputTranslateX", "itx", MFnNumericData::kDouble,0);
-	numFn.setStorable(true);
-	numFn.setKeyable(true);
-	numFn.setWritable(true);
-	addAttribute(inputTranslateX);
+	effectorMatrix = matrixFn.create("effectorMatrix", "efm");
+	addAttribute(effectorMatrix);
 
-	inputTranslateY = numFn.create("inputTranslateY", "ity", MFnNumericData::kDouble, 0);
-	numFn.setStorable(true);
-	numFn.setKeyable(true);
-	numFn.setWritable(true);
-	addAttribute(inputTranslateY);
-
-	inputTranslateZ = numFn.create("inputTranslateZ", "itz", MFnNumericData::kDouble, 0);
-	numFn.setStorable(true);
-	numFn.setKeyable(true);
-	numFn.setWritable(true);
-	addAttribute(inputTranslateZ);
-
-	inputTranslate = compound.create("InputTranslate", "intr");
-	compound.addChild(inputTranslateX);
-	compound.addChild(inputTranslateY);
-	compound.addChild(inputTranslateZ);
-	compound.setStorable(true);
-	compound.setKeyable(true);
-	compound.setWritable(true);
-	addAttribute(inputTranslate);
-
-	outputRotateX = uAttr.create("outputRotateX", "orx", MFnUnitAttribute::kAngle, 0.0);
+	jnt1OutputRotateX = uAttr.create("jnt1OutputRotateX", "jnt1rx", MFnUnitAttribute::kAngle, 0.0);
 	uAttr.setStorable(false);
 	uAttr.setKeyable(false);
 	uAttr.setWritable(false);
-	addAttribute(outputRotateX);
+	addAttribute(jnt1OutputRotateX);
 
-	outputRotateY = uAttr.create("outputRotateY", "ory", MFnUnitAttribute::kAngle, 0.0);
+	jnt1OutputRotateY = uAttr.create("jnt1OutputRotateY", "jnt1ry", MFnUnitAttribute::kAngle, 0.0);
 	uAttr.setStorable(false);
 	uAttr.setKeyable(false);
 	uAttr.setWritable(false);
-	addAttribute(outputRotateY);
+	addAttribute(jnt1OutputRotateY);
 
-	outputRotateZ = uAttr.create("outputRotateZ", "orz", MFnUnitAttribute::kAngle, 0.0);
+	jnt1OutputRotateZ = uAttr.create("jnt1OutputRotateZ", "jnt1rz", MFnUnitAttribute::kAngle, 0.0);
 	uAttr.setStorable(false);
 	uAttr.setKeyable(false);
 	uAttr.setWritable(false);
-	addAttribute(outputRotateZ);
+	addAttribute(jnt1OutputRotateZ);
 
-	outputRotate = compound.create("outputRotate", "or");
-	compound.addChild(outputRotateX);
-	compound.addChild(outputRotateY);
-	compound.addChild(outputRotateZ);
+	jnt1OutputRotate = compound.create("jnt1OutputRotate", "jnt1or");
+	compound.addChild(jnt1OutputRotateX);
+	compound.addChild(jnt1OutputRotateY);
+	compound.addChild(jnt1OutputRotateZ);
 	compound.setStorable(false);
 	compound.setKeyable(false);
 	compound.setWritable(false);
-	addAttribute(outputRotate);
+	addAttribute(jnt1OutputRotate);
 
-	attributeAffects(inputTranslate, outputRotate);
-	attributeAffects(upVectorMatrix, outputRotate);
-	attributeAffects(driverMatrix, outputRotate);
+	jnt2OutputRotateX = uAttr.create("jnt2OutputRotateX", "jnt2rx", MFnUnitAttribute::kAngle, 0.0);
+	uAttr.setStorable(false);
+	uAttr.setKeyable(false);
+	uAttr.setWritable(false);
+	addAttribute(jnt2OutputRotateX);
+
+	jnt2OutputRotateY = uAttr.create("jnt2OutputRotateY", "jnt2ry", MFnUnitAttribute::kAngle, 0.0);
+	uAttr.setStorable(false);
+	uAttr.setKeyable(false);
+	uAttr.setWritable(false);
+	addAttribute(jnt2OutputRotateY);
+
+	jnt2OutputRotateZ = uAttr.create("jnt2OutputRotateZ", "jnt2rz", MFnUnitAttribute::kAngle, 0.0);
+	uAttr.setStorable(false);
+	uAttr.setKeyable(false);
+	uAttr.setWritable(false);
+	addAttribute(jnt2OutputRotateZ);
+
+	jnt2OutputRotate = compound.create("jnt2OutputRotate", "jnt2or");
+	compound.addChild(jnt2OutputRotateX);
+	compound.addChild(jnt2OutputRotateY);
+	compound.addChild(jnt2OutputRotateZ);
+	compound.setStorable(false);
+	compound.setKeyable(false);
+	compound.setWritable(false);
+	addAttribute(jnt2OutputRotate);
+
+	attributeAffects(baseMatrix, jnt2OutputRotate);
+	attributeAffects(poleVectorMatrix, jnt2OutputRotate);
+	attributeAffects(effectorMatrix, jnt2OutputRotate);
+
+	attributeAffects(baseMatrix, jnt1OutputRotate);
+	attributeAffects(poleVectorMatrix, jnt1OutputRotate);
+	attributeAffects(effectorMatrix, jnt1OutputRotate);
 
 	return MS::kSuccess;
 }

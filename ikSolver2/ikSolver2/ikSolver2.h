@@ -13,17 +13,24 @@ public:
 
 public:
 	static MTypeId typeId;
-	static MObject inputTranslateX;
-	static MObject inputTranslateY;
-	static MObject inputTranslateZ;
-	static MObject inputTranslate;
-	static MObject outputRotateX;
-	static MObject outputRotateY;
-	static MObject outputRotateZ;
-	static MObject outputRotate;
 
-	static MObject driverMatrix;
-	static MObject upVectorMatrix;
+	static MObject joint1initLength;
+	static MObject joint2initLength;
+	
+	static MObject jnt1OutputRotateX;
+	static MObject jnt1OutputRotateY;
+	static MObject jnt1OutputRotateZ;
+	static MObject jnt1OutputRotate;
+
+	static MObject jnt2OutputRotateX;
+	static MObject jnt2OutputRotateY;
+	static MObject jnt2OutputRotateZ;
+	static MObject jnt2OutputRotate;
+
+	static MObject effectorMatrix;
+	static MObject poleVectorMatrix;
+	static MObject baseMatrix;
+
 };
 
 #endif
